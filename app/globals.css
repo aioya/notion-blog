@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #2e405b;
+  --primary: #276077;
+  --muted: #71717a;
+  --grid-line: rgb(0 0 0 / 0.04);
+}
+
+.dark {
+  --background: rgb(35, 34, 34);
+  --foreground: #e4e4e7;
+  --primary: #d1d5db;
+  --muted: #a1a1aa;
+  --grid-line: rgb(255 255 255 / 0.04);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-muted: var(--muted);
+  --font-sans:
+    "Source Sans Pro", Roboto, Helvetica, "Helvetica Neue",
+    "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-serif:
+    "Source Han Serif SC", "Source Han Serif CN", "Noto Serif SC",
+    "Songti SC", "SimSun", serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    monospace;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  /* subtle grid like typography theme */
+  background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 7px 7px;
+  text-shadow: 1px 1px 1px rgb(0 0 0 / 0.04);
+  min-height: 100vh;
+}
+
+/* react-notion-x dark tweaks */
+.dark .notion {
+  --fg-color: #e4e4e7;
+  --fg-color-0: var(--fg-color);
+  --fg-color-1: var(--fg-color);
+  --fg-color-2: #a1a1aa;
+  --fg-color-3: #71717a;
+  --fg-color-4: #52525b;
+  --fg-color-5: #3f3f46;
+  --fg-color-6: #27272a;
+  --fg-color-icon: #a1a1aa;
+  --bg-color: transparent;
+  --bg-color-0: transparent;
+  --bg-color-1: rgb(255 255 255 / 0.04);
+  --bg-color-2: rgba(135, 131, 120, 0.15);
+}
+
+.notion-page-wrapper .notion {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.notion-page-wrapper .notion-page {
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+}
+
+.notion-page-wrapper .notion-title {
+  display: none; /* we render our own title */
+}
+
+.notion-page-wrapper .notion-code {
+  border-radius: 0.5rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
