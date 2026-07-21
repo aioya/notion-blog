@@ -1,11 +1,14 @@
 import { PostList } from '@/components/post-list'
+import { Pagination } from '@/components/pagination'
 import { getSiteData } from '@/lib/notion'
+import { paginate } from '@/lib/pagination'
 import { siteConfig } from '@/lib/config'
 
 export const revalidate = 60
 
 export default async function HomePage() {
   const data = await getSiteData()
+  const slice = paginate(data.posts, 1)
 
   return (
     <div>
@@ -18,6 +21,9 @@ export default async function HomePage() {
             {data.siteDescription || siteConfig.description}
           </p>
         )}
+        <p className="mt-2 text-xs text-zinc-400">
+          共 {data.posts.length} 篇文章
+        </p>
         {(data.tags.length > 0 || data.categories.length > 0) && (
           <div className="mt-4 flex flex-wrap gap-2 text-xs">
             {data.categories.map((cat) => (
@@ -29,7 +35,7 @@ export default async function HomePage() {
                 {cat}
               </a>
             ))}
-            {data.tags.slice(0, 12).map((tag) => (
+            {data.tags.map((tag) => (
               <a
                 key={tag}
                 href={`/tag/${encodeURIComponent(tag)}`}
@@ -42,7 +48,13 @@ export default async function HomePage() {
         )}
       </section>
 
-      <PostList posts={data.posts} />
+      <PostList posts={slice.items} />
+      <Pagination
+        page={slice.page}
+        totalPages={slice.totalPages}
+        total={slice.total}
+        basePath=""
+      />
     </div>
   )
 }

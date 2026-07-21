@@ -33,6 +33,9 @@ export const siteConfig = {
 
   /** Which Notion database view to use (0 = first) */
   notionIndex: Number(process.env.NEXT_PUBLIC_NOTION_INDEX || 0),
+
+  /** Posts per page on list views */
+  postsPerPage: Number(process.env.NEXT_PUBLIC_POSTS_PER_PAGE || 12),
 } as const
 
 export type SiteConfig = typeof siteConfig

@@ -26,13 +26,16 @@ pnpm dev
 
 | 路径 | 说明 |
 |------|------|
-| `/` | 文章列表 |
+| `/` | 文章列表（第 1 页） |
+| `/page/[n]` | 文章列表分页 |
 | `/article/[slug]` | 文章正文（react-notion-x） |
-| `/tag/[tag]` | 标签筛选 |
-| `/category/[cat]` | 分类筛选 |
+| `/tag/[tag]`、`/tag/[tag]/page/[n]` | 标签筛选 + 分页 |
+| `/category/[cat]`、`/category/[cat]/page/[n]` | 分类筛选 + 分页 |
 | `/rss.xml` | RSS 2.0 |
 | `/sitemap.xml` | Sitemap |
 | `/robots.txt` | Robots |
+
+每页条数默认 12，可用 `NEXT_PUBLIC_POSTS_PER_PAGE` 调整。
 
 ## Notion 约定
 

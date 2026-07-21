@@ -160,6 +160,24 @@ function normalizeMetadata(
 
 // ── Page ID extraction ────────────────────────────────────────────────
 
+function collectBlockIdsFromViewData(viewData: unknown): string[] {
+  if (!viewData || typeof viewData !== 'object') return []
+  const vd = viewData as Record<string, unknown>
+  const group = vd.collection_group_results as { blockIds?: string[] } | undefined
+  const results = vd.results as { blockIds?: string[] } | undefined
+  const ids = [
+    ...(group?.blockIds || []),
+    ...(results?.blockIds || []),
+    ...((vd.blockIds as string[] | undefined) || []),
+  ]
+  return ids.filter(Boolean)
+}
+
+/**
+ * Collect row IDs from collection views.
+ * Prefer the configured view (notionIndex), then union remaining views so
+ * filtered views don't hide published posts that only appear elsewhere.
+ */
 function getAllPageIds(
   collectionQuery: ExtendedRecordMap['collection_query'] | undefined,
   collectionId: string | null,
@@ -167,51 +185,39 @@ function getAllPageIds(
   viewIds: string[] | undefined,
 ): string[] {
   const pageSet = new Set<string>()
-  const targetViewId = viewIds?.[siteConfig.notionIndex] ?? viewIds?.[0]
+  const preferredViewId = viewIds?.[siteConfig.notionIndex] ?? viewIds?.[0]
 
   const viewQuery = getRecordById(
     collectionQuery as Record<string, unknown> | undefined,
     collectionId,
   ) as Record<string, unknown> | null
 
-  let hasQueryData = false
   if (viewQuery) {
-    const selected = getRecordById(
-      viewQuery as Record<string, unknown>,
-      targetViewId,
-    )
-    const queryData = selected
-      ? [selected]
-      : targetViewId
-        ? []
-        : Object.values(viewQuery)
+    // 1) Preferred view first (keeps its relative order when we iterate later)
+    if (preferredViewId) {
+      const selected = getRecordById(
+        viewQuery as Record<string, unknown>,
+        preferredViewId,
+      )
+      collectBlockIdsFromViewData(selected).forEach((id) => pageSet.add(id))
+    }
 
-    hasQueryData = queryData.length > 0
-    for (const viewData of queryData) {
-      const vd = viewData as Record<string, unknown>
-      const group = vd?.collection_group_results as
-        | { blockIds?: string[] }
-        | undefined
-      const results = vd?.results as { blockIds?: string[] } | undefined
-      for (const ids of [
-        group?.blockIds,
-        results?.blockIds,
-        vd?.blockIds as string[] | undefined,
-      ]) {
-        if (Array.isArray(ids)) ids.forEach((id) => pageSet.add(id))
-      }
+    // 2) Union all views so nothing is dropped by a single filtered view
+    for (const viewData of Object.values(viewQuery)) {
+      collectBlockIdsFromViewData(viewData).forEach((id) => pageSet.add(id))
     }
   }
 
   // Fallback: page_sort when no query results
-  if (!hasQueryData && collectionView && targetViewId) {
+  if (pageSet.size === 0 && collectionView && preferredViewId) {
     const selectedView = getRecordById(
       collectionView as unknown as Record<string, unknown>,
-      targetViewId,
-    ) as { value?: { value?: { page_sort?: string[] }; page_sort?: string[] } } | null
+      preferredViewId,
+    ) as {
+      value?: { value?: { page_sort?: string[] }; page_sort?: string[] }
+    } | null
     const pageSort =
-      selectedView?.value?.value?.page_sort ||
-      selectedView?.value?.page_sort
+      selectedView?.value?.value?.page_sort || selectedView?.value?.page_sort
     if (Array.isArray(pageSort)) {
       pageSort.forEach((id) => pageSet.add(id))
     }

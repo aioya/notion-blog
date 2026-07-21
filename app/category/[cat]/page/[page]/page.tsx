@@ -1,17 +1,24 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { PostList } from '@/components/post-list'
 import { Pagination } from '@/components/pagination'
 import { getSiteData } from '@/lib/notion'
-import { paginate } from '@/lib/pagination'
+import { pageNumbersFor, paginate } from '@/lib/pagination'
 
 export const revalidate = 60
 
 export async function generateStaticParams() {
   try {
-    const { categories } = await getSiteData()
-    return categories.map((cat) => ({ cat }))
+    const { posts, categories } = await getSiteData()
+    const params: { cat: string; page: string }[] = []
+    for (const cat of categories) {
+      const filtered = posts.filter((p) => p.category === cat)
+      for (const page of pageNumbersFor(filtered)) {
+        params.push({ cat, page: String(page) })
+      }
+    }
+    return params
   } catch {
     return []
   }
@@ -20,30 +27,37 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ cat: string }>
+  params: Promise<{ cat: string; page: string }>
 }): Promise<Metadata> {
-  const { cat } = await params
+  const { cat, page } = await params
   const decoded = decodeURIComponent(cat)
   return {
-    title: decoded,
-    description: `分类「${decoded}」下的文章`,
+    title: `${decoded} · 第 ${page} 页`,
   }
 }
 
-export default async function CategoryPage({
+export default async function CategoryPaged({
   params,
 }: {
-  params: Promise<{ cat: string }>
+  params: Promise<{ cat: string; page: string }>
 }) {
-  const { cat } = await params
+  const { cat, page: pageStr } = await params
   const decoded = decodeURIComponent(cat)
-  const { posts, categories } = await getSiteData()
+  const page = Number(pageStr)
 
+  if (!Number.isFinite(page) || page < 1 || !Number.isInteger(page)) {
+    notFound()
+  }
+
+  const { posts, categories } = await getSiteData()
   if (!categories.includes(decoded)) notFound()
 
-  const filtered = posts.filter((p) => p.category === decoded)
-  const slice = paginate(filtered, 1)
   const basePath = `/category/${encodeURIComponent(decoded)}`
+  if (page === 1) redirect(basePath)
+
+  const filtered = posts.filter((p) => p.category === decoded)
+  const slice = paginate(filtered, page)
+  if (page > slice.totalPages) notFound()
 
   return (
     <div>
@@ -55,7 +69,9 @@ export default async function CategoryPage({
           ← 返回
         </Link>
         <h1 className="mt-3 font-serif text-2xl font-semibold">{decoded}</h1>
-        <p className="mt-1 text-sm text-zinc-400">共 {filtered.length} 篇文章</p>
+        <p className="mt-1 text-sm text-zinc-400">
+          共 {filtered.length} 篇 · 第 {slice.page}/{slice.totalPages} 页
+        </p>
       </header>
       <PostList posts={slice.items} emptyText="该分类下暂无文章" />
       <Pagination

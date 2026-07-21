@@ -1,17 +1,24 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { PostList } from '@/components/post-list'
 import { Pagination } from '@/components/pagination'
 import { getSiteData } from '@/lib/notion'
-import { paginate } from '@/lib/pagination'
+import { pageNumbersFor, paginate } from '@/lib/pagination'
 
 export const revalidate = 60
 
 export async function generateStaticParams() {
   try {
-    const { tags } = await getSiteData()
-    return tags.map((tag) => ({ tag }))
+    const { posts, tags } = await getSiteData()
+    const params: { tag: string; page: string }[] = []
+    for (const tag of tags) {
+      const filtered = posts.filter((p) => p.tags.includes(tag))
+      for (const page of pageNumbersFor(filtered)) {
+        params.push({ tag, page: String(page) })
+      }
+    }
+    return params
   } catch {
     return []
   }
@@ -20,30 +27,37 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ tag: string }>
+  params: Promise<{ tag: string; page: string }>
 }): Promise<Metadata> {
-  const { tag } = await params
+  const { tag, page } = await params
   const decoded = decodeURIComponent(tag)
   return {
-    title: `#${decoded}`,
-    description: `标签「${decoded}」下的文章`,
+    title: `#${decoded} · 第 ${page} 页`,
   }
 }
 
-export default async function TagPage({
+export default async function TagPaged({
   params,
 }: {
-  params: Promise<{ tag: string }>
+  params: Promise<{ tag: string; page: string }>
 }) {
-  const { tag } = await params
+  const { tag, page: pageStr } = await params
   const decoded = decodeURIComponent(tag)
-  const { posts, tags } = await getSiteData()
+  const page = Number(pageStr)
 
+  if (!Number.isFinite(page) || page < 1 || !Number.isInteger(page)) {
+    notFound()
+  }
+
+  const { posts, tags } = await getSiteData()
   if (!tags.includes(decoded)) notFound()
 
-  const filtered = posts.filter((p) => p.tags.includes(decoded))
-  const slice = paginate(filtered, 1)
   const basePath = `/tag/${encodeURIComponent(decoded)}`
+  if (page === 1) redirect(basePath)
+
+  const filtered = posts.filter((p) => p.tags.includes(decoded))
+  const slice = paginate(filtered, page)
+  if (page > slice.totalPages) notFound()
 
   return (
     <div>
@@ -55,7 +69,9 @@ export default async function TagPage({
           ← 返回
         </Link>
         <h1 className="mt-3 font-serif text-2xl font-semibold">#{decoded}</h1>
-        <p className="mt-1 text-sm text-zinc-400">共 {filtered.length} 篇文章</p>
+        <p className="mt-1 text-sm text-zinc-400">
+          共 {filtered.length} 篇 · 第 {slice.page}/{slice.totalPages} 页
+        </p>
       </header>
       <PostList posts={slice.items} emptyText="该标签下暂无文章" />
       <Pagination
