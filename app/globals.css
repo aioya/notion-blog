@@ -81,6 +81,16 @@ body {
   display: none; /* we render our own title */
 }
 
+/* Hide Notion database property panel (type/status/slug/password…) —
+   we already show title/date/tags/summary in the page header. */
+.notion-page-wrapper .notion-collection-row,
+.notion-page-wrapper .notion-collection-row-body,
+.notion-page-wrapper .notion-page-icon-hero,
+.notion-page-wrapper .notion-header,
+.notion-page-wrapper .notion-page-cover {
+  display: none !important;
+}
+
 .notion-page-wrapper .notion-code {
   border-radius: 0.5rem;
 }

@@ -76,6 +76,7 @@ export function NotionPage({
         recordMap={recordMap}
         fullPage={false}
         darkMode={false}
+        disableHeader
         mapPageUrl={mapPageUrl}
         mapImageUrl={(url, block) =>
           mapImageUrl(url, block as { id?: string; type?: string }) || url
