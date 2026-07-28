@@ -13,11 +13,8 @@ export default async function HomePage() {
   return (
     <div>
       <section className="mb-8 border-b border-zinc-100 pb-8 dark:border-zinc-800">
-        <h1 className="font-serif text-2xl font-semibold tracking-tight text-[#2e405b] dark:text-zinc-100">
-          {data.siteTitle || siteConfig.title}
-        </h1>
         {(data.siteDescription || siteConfig.description) && (
-          <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
             {data.siteDescription || siteConfig.description}
           </p>
         )}
