@@ -7,8 +7,8 @@ export const siteConfig = {
   title: process.env.NEXT_PUBLIC_SITE_TITLE || 'Aybrea',
   description:
     process.env.NEXT_PUBLIC_SITE_DESCRIPTION || '技术笔记与随笔',
-  author: process.env.NEXT_PUBLIC_AUTHOR || 'Aybrea',
-  bio: process.env.NEXT_PUBLIC_BIO || '一个普通的干饭人🍚',
+  author: process.env.NEXT_PUBLIC_AUTHOR || 'Wren',
+  bio: process.env.NEXT_PUBLIC_BIO || 'Un jour je serai de retour près de toi',
   url: (
     process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
   ).replace(/\/$/, ''),
