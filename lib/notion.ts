@@ -327,7 +327,9 @@ function parseProperties(
   const href =
     type === 'Post'
       ? `/${siteConfig.postUrlPrefix}/${slug}`
-      : `/${slug}`
+      : /^https?:\/\//i.test(slug)
+        ? slug
+        : `/${slug}`
 
   return {
     id,

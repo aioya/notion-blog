@@ -26,6 +26,12 @@ export function Header({
             <Link
               key={p.slug}
               href={p.href}
+              target={/^https?:\/\//i.test(p.href) ? '_blank' : undefined}
+              rel={
+                /^https?:\/\//i.test(p.href)
+                  ? 'noopener noreferrer'
+                  : undefined
+              }
               className="hover:text-zinc-900 dark:hover:text-zinc-100"
             >
               {p.title}
