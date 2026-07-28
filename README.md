@@ -56,6 +56,29 @@ pnpm start    # 启动生产服务
 pnpm lint     # ESLint
 ```
 
+## Cloudflare Workers
+
+The app is configured for Cloudflare Workers through OpenNext. Deploy with:
+
+```bash
+NEXT_PUBLIC_SITE_URL=https://notion-blog.aioya.workers.dev pnpm cf:deploy
+```
+
+Useful local commands:
+
+```bash
+pnpm cf:build    # Build the Worker bundle
+pnpm cf:preview  # Build and preview with the Workers runtime
+```
+
+Set the same `NEXT_PUBLIC_*` values during builds when using Cloudflare's Git
+integration. `NOTION_PAGE_ID` can remain public because this app reads a public
+Notion page without an integration token.
+
+The default configuration avoids requiring R2. To persist ISR cache entries
+across Worker instances, enable R2 in Cloudflare and configure OpenNext's R2
+incremental-cache override.
+
 ## MVP 边界
 
 不做：评论、统计、广告、全文搜索、多主题、多语言、Notion CONFIG 表覆盖。
