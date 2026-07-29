@@ -105,6 +105,23 @@ body {
   font-size: 1em;
 }
 
+/* Replace an inline Notion table-of-contents column with the responsive
+   article navigation rendered beside the page. */
+.notion-page-wrapper
+  .notion-row:has(> .notion-column > .notion-table-of-contents)
+  > .notion-column:has(> .notion-table-of-contents),
+.notion-page-wrapper
+  .notion-row:has(> .notion-column > .notion-table-of-contents)
+  > .notion-spacer {
+  display: none;
+}
+
+.notion-page-wrapper
+  .notion-row:has(> .notion-column > .notion-table-of-contents)
+  > .notion-column {
+  width: 100% !important;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

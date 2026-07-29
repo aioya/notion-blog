@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import type { PageBlock } from 'notion-types'
+import { getBlockValue, getPageTableOfContents } from 'notion-utils'
 import { ArticleBackLink } from '@/components/article-back-link'
+import { ArticleTableOfContents } from '@/components/article-table-of-contents'
 import { NotionPage } from '@/components/notion-page'
 import { getAllPostSlugs, getPost, getSiteData } from '@/lib/notion'
 import { siteConfig } from '@/lib/config'
@@ -63,6 +66,19 @@ export default async function ArticlePage({
     ? pageUrlMap[parentPageId] ||
       `/${siteConfig.postUrlPrefix}/${parentPageId}`
     : '/'
+  const pageBlock = Object.values(post.blockMap.block)
+    .map((block) => getBlockValue(block))
+    .find(
+      (block) =>
+        block?.id.replace(/-/g, '') === post.id.replace(/-/g, ''),
+    ) as PageBlock | undefined
+  const hasTableOfContents = Object.values(post.blockMap.block).some(
+    (block) => getBlockValue(block)?.type === 'table_of_contents',
+  )
+  const tableOfContents =
+    pageBlock && hasTableOfContents
+      ? getPageTableOfContents(pageBlock, post.blockMap)
+      : []
   const related = posts
     .filter((p) => p.id !== post.id)
     .filter(
@@ -73,7 +89,7 @@ export default async function ArticlePage({
     .slice(0, 4)
 
   return (
-    <article>
+    <article className="relative">
       <header className="mb-8 border-b border-zinc-100 pb-8 dark:border-zinc-800">
         <ArticleBackLink fallbackHref={backHref} />
         <h1 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-[#2e405b] dark:text-zinc-50">
@@ -110,6 +126,8 @@ export default async function ArticlePage({
           </p>
         ) : null}
       </header>
+
+      <ArticleTableOfContents items={tableOfContents} />
 
       <NotionPage recordMap={post.blockMap} pageUrlMap={pageUrlMap} />
 
