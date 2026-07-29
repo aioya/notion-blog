@@ -1,6 +1,10 @@
 packages:
   - '.'
 
+peerDependencyRules:
+  allowedVersions:
+    eslint: '10'
+
 allowBuilds:
   canvas: true
   esbuild: true
