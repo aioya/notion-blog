@@ -596,6 +596,10 @@ export const getPost = cache(
 
     return {
       id: pageId,
+      parentId:
+        typeof pageBlock.parent_id === 'string'
+          ? pageBlock.parent_id
+          : undefined,
       title: title || 'Untitled',
       slug: compactPageId,
       href: `/${siteConfig.postUrlPrefix}/${compactPageId}`,

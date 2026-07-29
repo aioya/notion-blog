@@ -5,6 +5,7 @@ export type PostType = 'Post' | 'Page' | string
 
 export interface Post {
   id: string
+  parentId?: string
   title: string
   slug: string
   href: string

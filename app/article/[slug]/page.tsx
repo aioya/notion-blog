@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ArticleBackLink } from '@/components/article-back-link'
 import { NotionPage } from '@/components/notion-page'
 import { getAllPostSlugs, getPost, getSiteData } from '@/lib/notion'
 import { siteConfig } from '@/lib/config'
@@ -57,6 +58,11 @@ export default async function ArticlePage({
       page.href,
     ]),
   )
+  const parentPageId = post.parentId?.replace(/-/g, '')
+  const backHref = parentPageId
+    ? pageUrlMap[parentPageId] ||
+      `/${siteConfig.postUrlPrefix}/${parentPageId}`
+    : '/'
   const related = posts
     .filter((p) => p.id !== post.id)
     .filter(
@@ -69,12 +75,7 @@ export default async function ArticlePage({
   return (
     <article>
       <header className="mb-8 border-b border-zinc-100 pb-8 dark:border-zinc-800">
-        <Link
-          href="/"
-          className="text-xs text-zinc-400 transition hover:text-zinc-600 dark:hover:text-zinc-300"
-        >
-          ← 返回
-        </Link>
+        <ArticleBackLink fallbackHref={backHref} />
         <h1 className="mt-4 font-serif text-3xl font-semibold tracking-tight text-[#2e405b] dark:text-zinc-50">
           {post.title}
         </h1>
