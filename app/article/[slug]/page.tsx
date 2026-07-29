@@ -50,7 +50,13 @@ export default async function ArticlePage({
   if (!post) notFound()
 
   // related: same category or shared tags
-  const { posts } = await getSiteData()
+  const { posts, pages } = await getSiteData()
+  const pageUrlMap = Object.fromEntries(
+    [...posts, ...pages].map((page) => [
+      page.id.replace(/-/g, ''),
+      page.href,
+    ]),
+  )
   const related = posts
     .filter((p) => p.id !== post.id)
     .filter(
@@ -104,7 +110,7 @@ export default async function ArticlePage({
         ) : null}
       </header>
 
-      <NotionPage recordMap={post.blockMap} />
+      <NotionPage recordMap={post.blockMap} pageUrlMap={pageUrlMap} />
 
       {related.length > 0 ? (
         <aside className="mt-16 border-t border-zinc-100 pt-8 dark:border-zinc-800">

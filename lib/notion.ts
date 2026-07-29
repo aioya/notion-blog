@@ -566,10 +566,47 @@ export const getPost = cache(
     const meta =
       posts.find((p) => p.slug === slug) ||
       pages.find((p) => p.slug === slug)
-    if (!meta) return null
+    if (meta) {
+      const blockMap = await fetchPage(meta.id)
+      return { ...meta, blockMap }
+    }
 
-    const blockMap = await fetchPage(meta.id)
-    return { ...meta, blockMap }
+    const compactPageId = slug.replace(/-/g, '')
+    if (!/^[0-9a-fA-F]{32}$/.test(compactPageId)) return null
+
+    const pageId = toUuid(compactPageId)
+    const blockMap = await fetchPage(pageId)
+    const pageBlock = normalizePageBlock(
+      getRecordById(blockMap.block, pageId),
+    )
+    if (!pageBlock) return null
+
+    const properties = pageBlock.properties as
+      | Record<string, unknown>
+      | undefined
+    const titleValue = properties?.title
+    const title = titleValue
+      ? getTextContent(
+          titleValue as Parameters<typeof getTextContent>[0],
+        )
+      : 'Untitled'
+    const createdTime = Number(pageBlock.created_time) || Date.now()
+    const lastEditedDate =
+      Number(pageBlock.last_edited_time) || createdTime
+
+    return {
+      id: pageId,
+      title: title || 'Untitled',
+      slug: compactPageId,
+      href: `/${siteConfig.postUrlPrefix}/${compactPageId}`,
+      type: 'Page',
+      status: 'Published',
+      tags: [],
+      publishDate: createdTime,
+      publishDay: formatDay(createdTime),
+      lastEditedDate,
+      blockMap,
+    }
   },
 )
 

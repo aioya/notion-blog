@@ -60,17 +60,23 @@ const Modal = dynamic(
   { ssr: false },
 )
 
-function mapPageUrl(pageId: string) {
-  return `https://www.notion.so/${pageId.replace(/-/g, '')}`
-}
-
 export function NotionPage({
   recordMap,
   className,
+  pageUrlMap = {},
 }: {
   recordMap: ExtendedRecordMap
   className?: string
+  pageUrlMap?: Record<string, string>
 }) {
+  const mapPageUrl = (pageId: string) => {
+    const normalizedPageId = pageId.replace(/-/g, '')
+    return (
+      pageUrlMap[normalizedPageId] ||
+      `/${siteConfig.postUrlPrefix}/${normalizedPageId}`
+    )
+  }
+
   return (
     <div
       id="notion-article"
