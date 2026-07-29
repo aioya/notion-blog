@@ -36,11 +36,15 @@ async function loadPrismLanguages() {
   ]).catch(() => {})
 }
 
-const Code = dynamic(() =>
-  import('react-notion-x/third-party/code').then(async (m) => {
-    await loadPrismLanguages()
-    return m.Code
-  }),
+const Code = dynamic(
+  () =>
+    import('react-notion-x/third-party/code').then(async (m) => {
+      await loadPrismLanguages()
+      return m.Code
+    }),
+  // Prism mutates code-block class names after rendering. Keeping this
+  // component out of SSR avoids a class-order mismatch during hydration.
+  { ssr: false },
 )
 
 const Collection = dynamic(() =>

@@ -95,6 +95,16 @@ body {
   border-radius: 0.5rem;
 }
 
+.notion-page-wrapper .notion-code-copy {
+  top: 0.65em;
+  right: 0.65em;
+}
+
+.notion-page-wrapper .notion-code-copy-button {
+  padding: 0.4em;
+  font-size: 1em;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
