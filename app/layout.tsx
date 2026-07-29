@@ -6,7 +6,7 @@ import { getSiteData } from '@/lib/notion'
 import { siteConfig } from '@/lib/config'
 import './globals.css'
 
-export const revalidate = 60
+export const revalidate = 3600
 
 export async function generateMetadata(): Promise<Metadata> {
   let title = siteConfig.title

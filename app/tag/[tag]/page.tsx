@@ -6,7 +6,7 @@ import { Pagination } from '@/components/pagination'
 import { getSiteData } from '@/lib/notion'
 import { paginate } from '@/lib/pagination'
 
-export const revalidate = 60
+export const revalidate = 3600
 
 export async function generateStaticParams() {
   try {

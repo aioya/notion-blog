@@ -75,9 +75,13 @@ Set the same `NEXT_PUBLIC_*` values during builds when using Cloudflare's Git
 integration. `NOTION_PAGE_ID` can remain public because this app reads a public
 Notion page without an integration token.
 
-The default configuration avoids requiring R2. To persist ISR cache entries
-across Worker instances, enable R2 in Cloudflare and configure OpenNext's R2
-incremental-cache override.
+The deployment uses the `notion-blog-cache` R2 bucket for OpenNext's
+incremental cache, so ISR entries are shared across Worker instances. Enable
+R2 for the Cloudflare account and create the bucket before the first deploy:
+
+```bash
+pnpm exec wrangler r2 bucket create notion-blog-cache
+```
 
 ## MVP 边界
 

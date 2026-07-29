@@ -17,6 +17,12 @@
   "images": {
     "binding": "IMAGES"
   },
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "notion-blog-cache"
+    }
+  ],
   "observability": {
     "logs": {
       "enabled": true,
